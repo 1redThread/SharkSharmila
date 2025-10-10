@@ -30,26 +30,7 @@ app.get("/admin", (req, res) => {
     res.send("<pre>" + data + "</pre>");
   });
 });
-// Clear log via /violence?pass=YOUR_SECRET
-app.get("/violence", (req, res) => {
-  const secret = req.query.pass;
-  // set your secret here
-  const expected = "vodka";
 
-  if (!secret || secret !== expected) {
-    return res.status(403).send("❌ Forbidden");
-  }
-
-  const logFile = path.join(__dirname, "ip-log.txt");
-  fs.writeFile(logFile, "", err => {
-    if (err) {
-      console.error("Error clearing log:", err);
-      return res.status(500).send("❌ Failed to clear log.");
-    }
-    console.log("🧹 ip-log.txt cleared by /violence");
-    res.send("✅ Log cleared");
-  });
-});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log("🚀 Server running on port", port));
