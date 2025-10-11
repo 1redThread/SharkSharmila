@@ -12,20 +12,87 @@ const ADMIN_PASS = "rudrapass"; // change this to something stronger
 
 // Simple form to collect name
 app.get("/", (req, res) => {
-  res.send(`
-    <!doctype html>
-    <html>
-      <head><meta charset="utf-8"><title>Say your name</title></head>
-      <body style="font-family:system-ui,Segoe UI,Roboto,Arial;margin:40px">
-        <h2>Enter your name</h2>
-        <form method="POST" action="/submit">
-          <input name="name" required placeholder="Your name" autocomplete="name" />
-          <button type="submit">Submit</button>
-        </form>
-      </body>
-    </html>
+ res.send(`
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Welcome!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Montserrat', sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        overflow: hidden;
+        color: #fff;
+      }
+      h1 {
+        font-size: 3em;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+      }
+      .card {
+        background: rgba(255,255,255,0.1);
+        padding: 30px;
+        border-radius: 20px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      }
+      .ip {
+        font-weight: 700;
+        color: #ffd700;
+        font-size: 1.3em;
+      }
+      footer {
+        position: absolute;
+        bottom: 20px;
+        font-size: 0.9em;
+        color: #eee;
+      }
+      /* Floating circles animation */
+      .circle {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        animation: float 8s infinite;
+      }
+      .circle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
+      .circle:nth-child(2) { width: 50px; height: 50px; left: 80%; animation-delay: 2s; }
+      .circle:nth-child(3) { width: 100px; height: 100px; left: 40%; animation-delay: 4s; }
+      @keyframes float {
+        0% { transform: translateY(100vh); opacity: 0; }
+        50% { opacity: 0.5; }
+        100% { transform: translateY(-100vh); opacity: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+
+    <h1>👋 Welcome!</h1>
+    <div class="card">
+      <p>Your IP has been logged.(Thanks)</p>
+      <p>Visit Again!</p>
+      <p class="ip">${ip}</p>
+    </div>
+  </body>
+  </html>
   `);
-});
 
 // Handle form submission: get name, detect clean IP, save to file
 app.post("/submit", (req, res) => {
