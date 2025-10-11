@@ -133,6 +133,14 @@ app.get("/admin", (req, res) => {
     res.type("html").send(`<pre>${escapeHtml(data)}</pre>`);
   });
 });
+ app.get("/clear", (req, res) => {
+  if (req.query.pass !== ADMIN_PASS) return res.status(403).send("Forbidden");
+  fs.writeFile(logFile, "", err => {
+    if (err) return res.status(500).send("Failed to clear logs");
+    res.send("✅ Logs cleared");
+  });
+});
+
 
 // small helper to avoid basic HTML injection in responses
 function escapeHtml(s) {
