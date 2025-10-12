@@ -71,7 +71,7 @@ app.get("/", (req, res) => {
     <div class="circle"></div>
     <h1>👋 Welcome!</h1>
     <div class="card">
-      <p>Your IP has been logged. (Thanks!)</p>
+      <p>Your IP has been logged.(Thanks!)</p>
       <p> </p>
       <p class="ip">${ip}</p>
     </div>
