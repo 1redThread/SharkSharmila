@@ -89,55 +89,93 @@ app.post("/submit", (req, res) => {
     console.log("Logged:", line.trim());
     res.send(`
     <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Thank You</title>
-      <style>
-      footer{
-        font-size: 100px;
-      }
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        font-family: 'Montserrat', sans-serif;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        overflow: hidden;
-        color: #fff;
-      }
-      h1 { font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
-      .card {
-        background: rgba(255,255,255,0.1);
-        padding: 30px;
-        border-radius: 20px;
-        width: 350px;
-        text-align: center;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        backdrop-filter: blur(8px);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      .card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
-      .ip { font-weight: 700; color: #ffd700; font-size: 1.3em; }
-      footer { position: absolute; bottom: 20px; font-size: 0.9em; color: #eee; }
-      .circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.1); animation: float 8s infinite; }
-      .circle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
-      .circle:nth-child(2) { width: 50px; height: 50px; left: 80%; animation-delay: 2s; }
-      .circle:nth-child(3) { width: 100px; height: 100px; left: 40%; animation-delay: 4s; }
-      @keyframes float { 0% { transform: translateY(100vh); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-100vh); opacity: 0; } }
-    </style>
-    </head>
-    <body>
-      <h1>Thanks, ${escapeHtml(name)}!</h1>
-      <p>Your IP <span class="ip">${ip}</span> has been logged successfully ✅</p>
-      <a href="/">Go Back</a>
-      
-      <footer>Visit Again!😘</footer>
-    </body>
-    </html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Thank You</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 150px; /* space for footer */
+    }
+    h1 { 
+      font-size: 3em; 
+      margin-bottom: 20px; 
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3); 
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 20px;
+      width: 350px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      backdrop-filter: blur(8px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 20px;
+    }
+    .card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5); 
+    }
+    .ip { 
+      font-weight: 700; 
+      color: #ffd700; 
+      font-size: 1.3em; 
+    }
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 60px; 
+      font-weight: bold;
+      color: #ffd700;
+      text-align: center;
+      width: 100%;
+      line-height: 1.2;
+    }
+    .circle { 
+      position: absolute; 
+      border-radius: 50%; 
+      background: rgba(255,255,255,0.1); 
+      animation: float 8s infinite; 
+    }
+    .circle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
+    .circle:nth-child(2) { width: 50px; height: 50px; left: 80%; animation-delay: 2s; }
+    .circle:nth-child(3) { width: 100px; height: 100px; left: 40%; animation-delay: 4s; }
+    @keyframes float { 
+      0% { transform: translateY(100vh); opacity: 0; } 
+      50% { opacity: 0.5; } 
+      100% { transform: translateY(-100vh); opacity: 0; } 
+    }
+    a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Thanks, ${escapeHtml(name)}!</h1>
+  <p>Your IP <span class="ip">${ip}</span> has been logged successfully ✅</p>
+  <a href="/">Go Back</a>
+
+  <footer>Visit Again!😘</footer>
+</body>
+</html>
+
     `);
   });
 });
