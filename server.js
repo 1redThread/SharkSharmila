@@ -130,7 +130,10 @@ app.post("/submit", (req, res) => {
       <h1>Thanks, ${escapeHtml(name)}!</h1>
       <p>Your IP <span class="ip">${ip}</span> has been logged successfully ✅</p>
       <a href="/">Go Back</a>
-      <footer> Visit Again!😘</footer>
+      footer{
+        font-size: 20px;
+      }
+      <footer>Visit Again!😘</footer>
     </body>
     </html>
     `);
