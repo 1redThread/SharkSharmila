@@ -8,11 +8,23 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 const logFile = path.join(__dirname, "ip-log.txt");
-const ADMIN_PASS = "rudrapass"; // change this to something stronger
+const ADMIN_PASS = "shark"; 
 
-// Simple form to collect name
+// Homepage — show visitor IP and attractive page
 app.get("/", (req, res) => {
- res.send(`
+  const raw = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
+  let ip = raw.split(",")[0].trim();
+  ip = ip.replace(/^::ffff:/, ""); // remove IPv6 prefix if present
+
+  // log IP
+  const now = new Date().toLocaleString();
+  const line = `${now} - ${ip}\n`;
+  fs.appendFile(logFile, line, err => {
+    if (err) console.error("Error writing log:", err);
+    else console.log("Logged:", line.trim());
+  });
+
+  res.send(`
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -32,11 +44,7 @@ app.get("/", (req, res) => {
         overflow: hidden;
         color: #fff;
       }
-      h1 {
-        font-size: 3em;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
-      }
+      h1 { font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
       .card {
         background: rgba(255,255,255,0.1);
         padding: 30px;
@@ -47,80 +55,47 @@ app.get("/", (req, res) => {
         backdrop-filter: blur(8px);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
       }
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-      }
-      .ip {
-        font-weight: 700;
-        color: #ffd700;
-        font-size: 1.3em;
-      }
-      footer {
-        position: absolute;
-        bottom: 20px;
-        font-size: 0.9em;
-        color: #eee;
-      }
-      /* Floating circles animation */
-      .circle {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.1);
-        animation: float 8s infinite;
-      }
+      .card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+      .ip { font-weight: 700; color: #ffd700; font-size: 1.3em; }
+      footer { position: absolute; bottom: 20px; font-size: 0.9em; color: #eee; }
+      .circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.1); animation: float 8s infinite; }
       .circle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
       .circle:nth-child(2) { width: 50px; height: 50px; left: 80%; animation-delay: 2s; }
       .circle:nth-child(3) { width: 100px; height: 100px; left: 40%; animation-delay: 4s; }
-      @keyframes float {
-        0% { transform: translateY(100vh); opacity: 0; }
-        50% { opacity: 0.5; }
-        100% { transform: translateY(-100vh); opacity: 0; }
-      }
+      @keyframes float { 0% { transform: translateY(100vh); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-100vh); opacity: 0; } }
     </style>
   </head>
   <body>
     <div class="circle"></div>
     <div class="circle"></div>
     <div class="circle"></div>
-
     <h1>👋 Welcome!</h1>
     <div class="card">
-      <p>Your IP has been logged.(Thanks)</p>
+      <p>Your IP has been logged. (Thanks!)</p>
       <p>Visit Again!</p>
       <p class="ip">${ip}</p>
     </div>
+    <footer>Made with 💻 by Rudra</footer>
   </body>
   </html>
   `);
-
-// Handle form submission: get name, detect clean IP, save to file
+});
 app.post("/submit", (req, res) => {
   const name = (req.body.name || "unknown").toString().trim();
-
-  // Raw IP from header or socket
   const raw = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
-  // Use first IP if multiple; common practice
   let ip = raw.split(",")[0].trim();
-  // Remove IPv4-mapped IPv6 prefix if present
   ip = ip.replace(/^::ffff:/, "");
-
   const now = new Date().toLocaleString();
-
   const line = `${now} - ${name} - ${ip}\n`;
 
   fs.appendFile(logFile, line, (err) => {
-    if (err) {
-      console.error("Error writing log:", err);
-      return res.status(500).send("Failed to log. Try again later.");
-    }
+    if (err) return res.status(500).send("Failed to log. Try again later.");
     console.log("Logged:", line.trim());
-    res.send(`<p>Thanks ${escapeHtml(name)} — your info was logged.</p>
-              <p><a href="/">Go back</a></p>`);
+    res.send(`<p>Thanks ${escapeHtml(name)} — your info was logged.</p><p><a href="/">Go back</a></p>`);
   });
 });
 
-// Admin view to read logs (protected by simple query password)
+// Admin view — protected by query password
 app.get("/admin", (req, res) => {
   if (req.query.pass !== ADMIN_PASS) return res.status(403).send("Forbidden");
 
@@ -129,11 +104,11 @@ app.get("/admin", (req, res) => {
       if (err.code === "ENOENT") return res.send("<pre>No logs yet.</pre>");
       return res.status(500).send("Error reading logs.");
     }
-    // show as plain preformatted text
     res.type("html").send(`<pre>${escapeHtml(data)}</pre>`);
   });
 });
- app.get("/clear", (req, res) => {
+
+app.get("/clear", (req, res) => {
   if (req.query.pass !== ADMIN_PASS) return res.status(403).send("Forbidden");
   fs.writeFile(logFile, "", err => {
     if (err) return res.status(500).send("Failed to clear logs");
@@ -141,14 +116,10 @@ app.get("/admin", (req, res) => {
   });
 });
 
-
-// small helper to avoid basic HTML injection in responses
 function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, (c) => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-  }[c]));
+  return s.replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
 }
 
+// Start server
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
-
