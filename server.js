@@ -138,7 +138,7 @@ app.post("/submit", (req, res) => {
       bottom: 20px;
       font-size: 30px; 
       font-weight: bold;
-      color: #e63e62;
+      color: #ff69b4;
       text-align: center;
       width: 100%;
       line-height: 1.2;
