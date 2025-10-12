@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
   </head>
   <body>
     <div class="container">
-      <h1>👋 Welcome! 👋</h1>
+      <h1>👋 Welcome!👋</h1>
       <form action="/submit" method="POST">
         <input type="text" name="name" placeholder="Enter your name" required><br>
         <button type="submit">Submit</button>
