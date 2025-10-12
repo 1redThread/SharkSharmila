@@ -72,10 +72,10 @@ app.get("/", (req, res) => {
     <h1>👋 Welcome!</h1>
     <div class="card">
       <p>Your IP has been logged. (Thanks!)</p>
-      <p>Visit Again!</p>
+      <p> </p>
       <p class="ip">${ip}</p>
     </div>
-    <footer>Made with 💻 by Rudra</footer>
+    <footer>Visit Again!😘</footer>
   </body>
   </html>
   `);
