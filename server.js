@@ -4,6 +4,10 @@ const fs = require("fs");
 const path = require("path");
 const app = express();
 
+// ✅ Trust proxies for correct IP detection
+app.set('trust proxy', true);
+
+// Parse form bodies
 app.use(express.urlencoded({ extended: true }));
 
 const logFile = path.join(__dirname, "ip-log.txt");
@@ -19,7 +23,6 @@ app.get("/", (req, res) => {
     <title>Welcome Visitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-    
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: 'Montserrat', sans-serif;
@@ -63,7 +66,7 @@ app.get("/", (req, res) => {
   </head>
   <body>
     <div class="container">
-      <h1>👋Welcome!👋</h1>
+      <h1>👋 Welcome! 👋</h1>
       <form action="/submit" method="POST">
         <input type="text" name="name" placeholder="Enter your name" required><br>
         <button type="submit">Submit</button>
@@ -77,9 +80,11 @@ app.get("/", (req, res) => {
 // 🟩 STEP 2: Handle form submission and log IP + name
 app.post("/submit", (req, res) => {
   const name = (req.body.name || "unknown").toString().trim();
-  const raw = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "";
-  let ip = raw.split(",")[0].trim();
-  ip = ip.replace(/^::ffff:/, "");
+
+  // Safe IP detection
+  let ip = req.ip || req.socket.remoteAddress || "";
+  if (ip.includes(",")) ip = ip.split(",")[0]; // Take first if multiple
+  ip = ip.trim().replace(/^::ffff:/, "");       // Remove IPv4-mapped IPv6
 
   const now = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   const line = `${now} - ${name} - ${ip}\n`;
@@ -88,7 +93,7 @@ app.post("/submit", (req, res) => {
     if (err) return res.status(500).send("Failed to log.");
     console.log("Logged:", line.trim());
     res.send(`
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -109,11 +114,7 @@ app.post("/submit", (req, res) => {
       overflow: hidden;
       padding-bottom: 150px; /* space for footer */
     }
-    h1 { 
-      font-size: 3em; 
-      margin-bottom: 20px; 
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.3); 
-    }
+    h1 { font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
     .card {
       background: rgba(255,255,255,0.1);
       padding: 30px;
@@ -124,46 +125,24 @@ app.post("/submit", (req, res) => {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       margin-bottom: 20px;
     }
-    .card:hover { 
-      transform: translateY(-5px); 
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5); 
-    }
-    .ip { 
-      font-weight: 700; 
-      color: #ffd700; 
-      font-size: 1.3em; 
-    }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+    .ip { font-weight: 700; color: #ffd700; font-size: 1.3em; }
     footer {
       position: absolute;
       bottom: 20px;
-      font-size: 30px; 
+      font-size: 30px;
       font-weight: bold;
       color: #ff69b4;
       text-align: center;
       width: 100%;
       line-height: 1.2;
     }
-    .circle { 
-      position: absolute; 
-      border-radius: 50%; 
-      background: rgba(255,255,255,0.1); 
-      animation: float 8s infinite; 
-    }
+    .circle { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.1); animation: float 8s infinite; }
     .circle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
     .circle:nth-child(2) { width: 50px; height: 50px; left: 80%; animation-delay: 2s; }
     .circle:nth-child(3) { width: 100px; height: 100px; left: 40%; animation-delay: 4s; }
-    @keyframes float { 
-      0% { transform: translateY(100vh); opacity: 0; } 
-      50% { opacity: 0.5; } 
-      100% { transform: translateY(-100vh); opacity: 0; } 
-    }
-    a {
-      color: #ffd700;
-      text-decoration: none;
-      font-weight: bold;
-      margin-top: 10px;
-      display: inline-block;
-    }
+    @keyframes float { 0% { transform: translateY(100vh); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: translateY(-100vh); opacity: 0; } }
+    a { color: #ffd700; text-decoration: none; font-weight: bold; margin-top: 10px; display: inline-block; }
     a:hover { text-decoration: underline; }
   </style>
 </head>
@@ -171,11 +150,9 @@ app.post("/submit", (req, res) => {
   <h1>Thanks, ${escapeHtml(name)}!</h1>
   <p>Your IP <span class="ip">${ip}</span> has been logged successfully ✅</p>
   <a href="/">Go Back</a>
-
-  <footer>Visit Again!😘</footer>
+  <footer>Visit Again! 😘</footer>
 </body>
 </html>
-
     `);
   });
 });
@@ -201,14 +178,11 @@ app.get("/clear", (req, res) => {
   });
 });
 
-// Escape helper
+// Escape HTML helper
 function escapeHtml(s) {
-  return s.replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-  }[c]));
+  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
 
 // Start server
 const port = process.env.PORT || 10000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
-
