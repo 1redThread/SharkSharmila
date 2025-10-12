@@ -1,19 +1,15 @@
-// server.js
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const app = express();
 
-// ✅ Trust proxies for correct IP detection
 app.set('trust proxy', true);
 
-// Parse form bodies
 app.use(express.urlencoded({ extended: true }));
 
 const logFile = path.join(__dirname, "ip-log.txt");
 const ADMIN_PASS = "shark";
 
-// 🟦 STEP 1: Show form to take name
 app.get("/", (req, res) => {
   res.send(`
   <!DOCTYPE html>
@@ -77,14 +73,12 @@ app.get("/", (req, res) => {
   `);
 });
 
-// 🟩 STEP 2: Handle form submission and log IP + name
 app.post("/submit", (req, res) => {
   const name = (req.body.name || "unknown").toString().trim();
 
-  // Safe IP detection
   let ip = req.ip || req.socket.remoteAddress || "";
-  if (ip.includes(",")) ip = ip.split(",")[0]; // Take first if multiple
-  ip = ip.trim().replace(/^::ffff:/, "");       // Remove IPv4-mapped IPv6
+  if (ip.includes(",")) ip = ip.split(",")[0];
+  ip = ip.trim().replace(/^::ffff:/, "");
 
   const now = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   const line = `${now} - ${name} - ${ip}\n`;
@@ -157,7 +151,6 @@ app.post("/submit", (req, res) => {
   });
 });
 
-// 🧾 Admin panel
 app.get("/admin", (req, res) => {
   if (req.query.pass !== ADMIN_PASS) return res.status(403).send("Forbidden");
   fs.readFile(logFile, "utf8", (err, data) => {
@@ -169,7 +162,6 @@ app.get("/admin", (req, res) => {
   });
 });
 
-// 🧹 Clear logs
 app.get("/clear", (req, res) => {
   if (req.query.pass !== ADMIN_PASS) return res.status(403).send("Forbidden");
   fs.writeFile(logFile, "", err => {
@@ -178,11 +170,9 @@ app.get("/clear", (req, res) => {
   });
 });
 
-// Escape HTML helper
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 }
 
-// Start server
 const port = process.env.PORT || 10000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
