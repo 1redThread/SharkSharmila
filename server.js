@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
     <title>Welcome Visitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
+    
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: 'Montserrat', sans-serif;
@@ -93,6 +94,9 @@ app.post("/submit", (req, res) => {
       <meta charset="UTF-8">
       <title>Thank You</title>
       <style>
+      footer{
+        font-size: 20px;
+      }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
         font-family: 'Montserrat', sans-serif;
@@ -130,9 +134,7 @@ app.post("/submit", (req, res) => {
       <h1>Thanks, ${escapeHtml(name)}!</h1>
       <p>Your IP <span class="ip">${ip}</span> has been logged successfully ✅</p>
       <a href="/">Go Back</a>
-      footer{
-        font-size: 20px;
-      }
+      
       <footer>Visit Again!😘</footer>
     </body>
     </html>
