@@ -95,7 +95,7 @@ app.post("/submit", (req, res) => {
       <title>Thank You</title>
       <style>
       footer{
-        font-size: 20px;
+        font-size: 100px;
       }
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
