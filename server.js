@@ -80,7 +80,7 @@ app.post("/submit", (req, res) => {
   let ip = raw.split(",")[0].trim();
   ip = ip.replace(/^::ffff:/, "");
 
-  const now = new Date().toLocaleString();
+  const now = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
   const line = `${now} - ${name} - ${ip}\n`;
 
   fs.appendFile(logFile, line, (err) => {
