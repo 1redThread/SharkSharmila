@@ -136,9 +136,9 @@ app.post("/submit", (req, res) => {
     footer {
       position: absolute;
       bottom: 20px;
-      font-size: 70px; 
+      font-size: 50px; 
       font-weight: bold;
-      color: #ffd700;
+      color: #ffc0cb;
       text-align: center;
       width: 100%;
       line-height: 1.2;
